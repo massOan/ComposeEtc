@@ -12,6 +12,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,15 +39,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Compose_etcTheme {
-
-
-                Column() {
-                    CheckboxFuction()
-                    CheckboxFuction()
-                    CheckboxFuction()
-                }
-                // A surface container using the 'background' color from the theme
-
+                SlotEx()
             }
         }
     }
@@ -66,7 +61,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DefaultPreview() {
     Compose_etcTheme {
-        CheckboxFuction()
+        TopAppBarFunction()
     }
 }
 
@@ -183,26 +178,26 @@ private fun ProfileCardFunction(cardData: CardData) {
 
 @Composable
 private fun CheckboxFuction() {
-    var (ischecked, setCheck)  =  remember { mutableStateOf(false) }
+    var (ischecked, setCheck) = remember { mutableStateOf(false) }
+    //비 구조화를 이용 문법
     //컴포저블함수는 언제든지 다시 그려질 수 있고, 상황때문에 상태가 날아갈 수 있다고 가정 해야한다.
     //여러 스레드에서 동시에 여러 컴포저블이 동시에 그리고 있을 수도 있다.
     //그냥 mutableStateOf 라고 선언할 경우 상태가 날아갈 수도 있다.
 
     Row(verticalAlignment = Alignment.CenterVertically,
-    modifier = Modifier.clickable {
+        modifier = Modifier.clickable {
             setCheck(!ischecked)
-    }) {
+        }) {
 
-        Checkbox(checked = ischecked,
+        Checkbox(
+            checked = ischecked,
             onCheckedChange = setCheck
             //onCheckedChange 는 반전된 결과일 경우만 호출이 된다 그럴경우,
             // 굳이 왜 우리가 checked를 반전 시켜서 사용하는가? ,
 
         )
         Text(text = "Compose 실습중입니까?")
-
     }
-
 }
 
 data class CardData(
@@ -211,4 +206,97 @@ data class CardData(
     val author: String,
     val description: String,
 ) {
+}
+
+@Composable
+private fun textFieldFuntion() {
+    var name by remember { mutableStateOf("Tom") }
+
+    Column(modifier = Modifier.padding(18.dp)) {
+        OutlinedTextField(
+            value = name,
+            label = { Text(text = "인간 이름 ") },
+            onValueChange = { name = it })
+
+        Spacer(modifier = Modifier.size(8.dp))
+        Text(text = "Hello $name")
+    }
+}
+
+@Composable
+private fun TopAppBarFunction() {
+    Column() {
+        TopAppBar(
+            title = { Text(text = "topappbar") },
+
+            navigationIcon = {
+                IconButton(onClick = {}) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = ""
+                    )
+                }
+            },
+
+            actions = {
+                IconButton(onClick = {}) {
+                    Icon(imageVector = Icons.Filled.Search, contentDescription = "검색")
+
+                }
+                IconButton(onClick = {}) {
+                    Icon(imageVector = Icons.Filled.Settings, contentDescription = "설정")
+
+                }
+                IconButton(onClick = {}) {
+                    Icon(imageVector = Icons.Filled.Person, contentDescription = "계정")
+
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun CheckBoxWithSlotFunction(
+    checked: Boolean,
+    onCheckedChanged: () -> Unit,
+    content: @Composable RowScope.() -> Unit,
+
+    ) {
+    Row(verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.clickable {
+            onCheckedChanged()
+        }) {
+
+        Checkbox(
+            checked = checked,
+            onCheckedChange = {
+                onCheckedChanged()
+            }
+            //onCheckedChange 는 반전된 결과일 경우만 호출이 된다 그럴경우,
+            // 굳이 왜 우리가 checked를 반전 시켜서 사용하는가? ,
+
+        )
+        content()
+    }
+}
+
+@Composable
+private fun SlotEx() {
+    var checked1 by remember { mutableStateOf(false) }
+    var checked2 by remember { mutableStateOf(false) }
+
+    Column() {
+        CheckBoxWithSlotFunction(checked = checked1,
+            onCheckedChanged = { checked1 = !checked1 }) {
+            Text("체크박스 11")
+
+        }
+        CheckBoxWithSlotFunction(checked = checked2,
+            onCheckedChanged = { checked2 = !checked2 }) {
+            Text("체크박스 222")
+
+        }
+
+    }
 }
