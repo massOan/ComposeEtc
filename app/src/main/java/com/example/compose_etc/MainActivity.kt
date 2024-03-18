@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Compose_etcTheme {
-                SlotEx()
+                ScaffoldEx2()
             }
         }
     }
@@ -281,6 +281,7 @@ private fun CheckBoxWithSlotFunction(
     }
 }
 
+
 @Composable
 private fun SlotEx() {
     var checked1 by remember { mutableStateOf(false) }
@@ -300,3 +301,41 @@ private fun SlotEx() {
 
     }
 }
+
+
+@Composable
+fun ScaffoldEx2() {
+    var checked by remember { mutableStateOf(false) }
+
+    Scaffold(topBar = {
+        TopAppBar(
+            navigationIcon = {
+               IconButton(onClick = {}) {
+                   Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "onBackPressedIcon" )
+               }
+
+            },
+
+            title = { Text(text = "텍스트") }
+        )
+        // 스텝 1: `topBar`를 `TopAppBar`로 채워 봅시다.
+
+    }) {
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+        ) {
+            Column {
+                CheckBoxWithSlotFunction(checked = checked,
+                    onCheckedChanged = { checked = !checked }) {
+                    Text("체크박스 11")
+                }
+            }
+        }
+    }
+}
+
+
+
+
