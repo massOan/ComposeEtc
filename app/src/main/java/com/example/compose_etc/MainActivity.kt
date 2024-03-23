@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import com.example.compose_etc.MainActivity.Companion.placeHoldercardData
@@ -71,7 +73,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DefaultPreview() {
     Compose_etcTheme {
-        TopAppBarFunction()
+        ConstraintsLayoutFunction()
     }
 }
 
@@ -443,4 +445,53 @@ val items = listOf(
 )
 
 
+@Composable
+fun ConstraintsLayoutFunction() {
+    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
 
+    val (redBox, magentaBox, greenBox, yellowBox) = createRefs()
+
+        Box(
+            modifier =
+            Modifier.size(40.dp).
+            background(Color.Red).
+            constrainAs(redBox) {
+                bottom.linkTo(parent.bottom, margin = 8.dp)
+                end.linkTo(parent.end, margin = 4.dp)
+            }
+        ) {
+
+        }
+        Box(
+            modifier =
+            Modifier.size(40.dp).
+            background(Color.Magenta).
+            constrainAs(magentaBox) {
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }) {
+
+        }
+        Box(
+            modifier =
+            Modifier.size(40.dp).
+            background(Color.Green).
+            constrainAs(greenBox) {
+                centerTo(parent)
+
+            }) {
+
+        }
+        Box(
+            modifier =
+            Modifier.size(40.dp).
+            background(Color.Yellow).
+            constrainAs(yellowBox) {
+                top.linkTo(magentaBox.bottom)
+                start.linkTo(magentaBox.end )
+            }) {
+
+        }
+
+    }
+}
