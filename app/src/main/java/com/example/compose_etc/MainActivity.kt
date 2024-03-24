@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -36,11 +37,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
 import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import com.example.compose_etc.MainActivity.Companion.placeHoldercardData
 import com.example.compose_etc.ui.theme.Compose_etcTheme
 import com.example.compose_etc.R.drawable
+import kotlin.contracts.contract
 
 
 class MainActivity : ComponentActivity() {
@@ -73,7 +76,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DefaultPreview() {
     Compose_etcTheme {
-        ConstraintsLayoutFunction()
+        ConstraintSetFunction()
     }
 }
 
@@ -322,9 +325,12 @@ fun ScaffoldEx2() {
     Scaffold(topBar = {
         TopAppBar(
             navigationIcon = {
-               IconButton(onClick = {}) {
-                   Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "onBackPressedIcon" )
-               }
+                IconButton(onClick = {}) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "onBackPressedIcon"
+                    )
+                }
 
             },
 
@@ -355,8 +361,10 @@ fun Item(itemData: ItemData) {
         modifier = Modifier.padding(16.dp)
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
-            Image(painter = painterResource(id = itemData.imageId),
-                contentDescription = itemData.title )
+            Image(
+                painter = painterResource(id = itemData.imageId),
+                contentDescription = itemData.title
+            )
             Spacer(modifier = Modifier.padding(8.dp))
 
             Text(text = itemData.title)
@@ -380,9 +388,9 @@ fun ItemPreview() {
 @Composable
 fun CatalogFuntion(itemList: List<ItemData>) {
 
-    LazyColumn{
+    LazyColumn {
         items(itemList) { it ->
-             Item(it)
+            Item(it)
         }
     }
 }
@@ -448,50 +456,91 @@ val items = listOf(
 @Composable
 fun ConstraintsLayoutFunction() {
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+    }
 
-    val (redBox, magentaBox, greenBox, yellowBox) = createRefs()
 
-        Box(
-            modifier =
-            Modifier.size(40.dp).
-            background(Color.Red).
-            constrainAs(redBox) {
-                bottom.linkTo(parent.bottom, margin = 8.dp)
-                end.linkTo(parent.end, margin = 4.dp)
+    @Composable
+    fun ConstraintSetFunction() {
+
+        val constraintSet = ConstraintSet {
+
+            val redBox = createRefFor("redBox")
+            val magentaBox = createRefFor("magentaBox")
+            val greenBox = createRefFor("greenBox")
+            val yellowBox = createRefFor("yellowBox")
+
+
+            constrain(redBox) {
+                bottom.linkTo(parent.bottom)
+                end.linkTo(parent.end)
             }
-        ) {
 
-        }
-        Box(
-            modifier =
-            Modifier.size(40.dp).
-            background(Color.Magenta).
-            constrainAs(magentaBox) {
+            constrain(magentaBox) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-            }) {
+            }
 
-        }
-        Box(
-            modifier =
-            Modifier.size(40.dp).
-            background(Color.Green).
-            constrainAs(greenBox) {
+            constrain(greenBox) {
                 centerTo(parent)
 
-            }) {
+            }
 
-        }
-        Box(
-            modifier =
-            Modifier.size(40.dp).
-            background(Color.Yellow).
-            constrainAs(yellowBox) {
-                top.linkTo(magentaBox.bottom)
-                start.linkTo(magentaBox.end )
-            }) {
+            constrain(yellowBox) {
+                top.linkTo(greenBox.bottom)
+                start.linkTo(greenBox.end)
+            }
 
         }
 
+        ConstraintLayout(
+            constraintSet,
+            modifier = Modifier.fillMaxSize()
+        ) {
+
+//        val (redBox, magentaBox, greenBox, yellowBox) = createRefs()
+
+            Box(
+                modifier =
+                Modifier
+                    .size(40.dp)
+                    .background(Color.Red)
+                    .layoutId("redBox")
+
+            ) {
+
+            }
+            Box(
+                modifier =
+                Modifier
+                    .size(40.dp)
+                    .background(Color.Magenta)
+                    .layoutId("magentaBox")
+
+            ) {
+
+            }
+            Box(
+                modifier =
+                Modifier
+                    .size(40.dp)
+                    .background(Color.Green)
+                    .layoutId("greenBox")
+
+            ) {
+
+            }
+            Box(
+                modifier =
+                Modifier
+                    .size(40.dp)
+                    .background(Color.Yellow)
+                    .layoutId("yellowBox")
+
+            ) {
+
+            }
+
+        }
     }
 }
+
