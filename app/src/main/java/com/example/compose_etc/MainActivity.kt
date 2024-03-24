@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Compose_etcTheme {
-                CatalogFuntion(items)
+                dialogEx()
             }
         }
     }
@@ -459,88 +459,135 @@ fun ConstraintsLayoutFunction() {
     }
 
 
-    @Composable
-    fun ConstraintSetFunction() {
-
-        val constraintSet = ConstraintSet {
-
-            val redBox = createRefFor("redBox")
-            val magentaBox = createRefFor("magentaBox")
-            val greenBox = createRefFor("greenBox")
-            val yellowBox = createRefFor("yellowBox")
+}
 
 
-            constrain(redBox) {
-                bottom.linkTo(parent.bottom)
-                end.linkTo(parent.end)
-            }
+@Composable
+fun ConstraintSetFunction() {
 
-            constrain(magentaBox) {
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
+    val constraintSet = ConstraintSet {
 
-            constrain(greenBox) {
-                centerTo(parent)
+        val redBox = createRefFor("redBox")
+        val magentaBox = createRefFor("magentaBox")
+        val greenBox = createRefFor("greenBox")
+        val yellowBox = createRefFor("yellowBox")
 
-            }
 
-            constrain(yellowBox) {
-                top.linkTo(greenBox.bottom)
-                start.linkTo(greenBox.end)
-            }
+        constrain(redBox) {
+            bottom.linkTo(parent.bottom)
+            end.linkTo(parent.end)
+        }
+
+        constrain(magentaBox) {
+            start.linkTo(parent.start)
+            end.linkTo(parent.end)
+        }
+
+        constrain(greenBox) {
+            centerTo(parent)
 
         }
 
-        ConstraintLayout(
-            constraintSet,
-            modifier = Modifier.fillMaxSize()
-        ) {
+        constrain(yellowBox) {
+            top.linkTo(greenBox.bottom)
+            start.linkTo(greenBox.end)
+        }
+
+    }
+
+    ConstraintLayout(
+        constraintSet,
+        modifier = Modifier.fillMaxSize()
+    ) {
 
 //        val (redBox, magentaBox, greenBox, yellowBox) = createRefs()
 
-            Box(
-                modifier =
-                Modifier
-                    .size(40.dp)
-                    .background(Color.Red)
-                    .layoutId("redBox")
+        Box(
+            modifier =
+            Modifier
+                .size(40.dp)
+                .background(Color.Red)
+                .layoutId("redBox")
 
-            ) {
-
-            }
-            Box(
-                modifier =
-                Modifier
-                    .size(40.dp)
-                    .background(Color.Magenta)
-                    .layoutId("magentaBox")
-
-            ) {
-
-            }
-            Box(
-                modifier =
-                Modifier
-                    .size(40.dp)
-                    .background(Color.Green)
-                    .layoutId("greenBox")
-
-            ) {
-
-            }
-            Box(
-                modifier =
-                Modifier
-                    .size(40.dp)
-                    .background(Color.Yellow)
-                    .layoutId("yellowBox")
-
-            ) {
-
-            }
+        ) {
 
         }
+        Box(
+            modifier =
+            Modifier
+                .size(40.dp)
+                .background(Color.Magenta)
+                .layoutId("magentaBox")
+
+        ) {
+
+        }
+        Box(
+            modifier =
+            Modifier
+                .size(40.dp)
+                .background(Color.Green)
+                .layoutId("greenBox")
+
+        ) {
+
+        }
+        Box(
+            modifier =
+            Modifier
+                .size(40.dp)
+                .background(Color.Yellow)
+                .layoutId("yellowBox")
+
+        ) {
+        }
     }
+}
+
+@Composable
+fun dialogEx() {
+    var openDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var count = remember {
+        mutableStateOf(0)
+    }
+
+    if (openDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                //Dialog 외부를 눌럿을때 타는 구문
+                openDialog = false
+            },
+            confirmButton = {
+                Button(onClick = {
+                    count.value ++
+                    openDialog = false
+                }) {
+                    Text(text = "더하기")
+                }
+            },
+            dismissButton = {
+                 Button(onClick = {openDialog = false}) {
+                     Text(text = "dismiss")
+                 }
+
+            },
+            title = { Text(text = "Dialog 예제") },
+            text = {
+                Text(text ="Dialog 예제이고 더하기를 누르면 count가 증가됩니다.")
+            }
+        )
+    }
+    Column {
+        Button(onClick = {
+            openDialog = true
+        }) {
+            Text(text = "다이얼로그 열기")
+        }
+        Text(text = "카운터 횟수 : ${count.value}")
+    }
+
 }
 
