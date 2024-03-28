@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import coil.compose.AsyncImage
@@ -43,6 +45,7 @@ import coil.compose.rememberImagePainter
 import com.example.compose_etc.MainActivity.Companion.placeHoldercardData
 import com.example.compose_etc.ui.theme.Compose_etcTheme
 import com.example.compose_etc.R.drawable
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import kotlin.contracts.contract
 
 
@@ -54,7 +57,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Compose_etcTheme {
-                dialogEx()
+                customDialogEx()
             }
         }
     }
@@ -562,31 +565,110 @@ fun dialogEx() {
             },
             confirmButton = {
                 Button(onClick = {
-                    count.value ++
+                    count.value++
                     openDialog = false
                 }) {
                     Text(text = "더하기")
                 }
             },
             dismissButton = {
-                 Button(onClick = {openDialog = false}) {
-                     Text(text = "dismiss")
-                 }
+                Button(onClick = { openDialog = false }) {
+                    Text(text = "dismiss")
+                }
 
             },
             title = { Text(text = "Dialog 예제") },
             text = {
-                Text(text ="Dialog 예제이고 더하기를 누르면 count가 증가됩니다.")
+                Text(text = "Dialog 예제이고 더하기를 누르면 count가 증가됩니다.")
             }
         )
     }
-    Column {
+
+}
+
+@Composable
+fun customDialogEx() {
+    var openDialog by remember { mutableStateOf(false) }
+
+    var count by remember { mutableStateOf(0) }
+
+    Column() {
+
+        if (openDialog) {
+            Dialog(onDismissRequest = { openDialog = false }) {
+                Surface(shape = RoundedCornerShape(15.dp)) {
+
+                    Column(
+                        modifier = Modifier
+                            .width(300.dp)
+                            .height(150.dp)
+                            .padding(8.dp)
+                            ,
+                    ) {
+                        Text(text = "현재 텍스트 입력 입력입력입력")
+
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.Bottom
+                        ) {
+                            Button(
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Color(0xFF5CB261),
+                                    contentColor = Color.White
+                                ), onClick = {
+                                    openDialog = false
+                                }) {
+                                Text(text = "denine")
+                            }
+                            Button(onClick = {
+                                openDialog = false
+
+                            }) {
+                                Text(text = "accept")
+                            }
+                        }
+
+                    }
+                }
+            }
+
+        }
+
         Button(onClick = {
             openDialog = true
         }) {
             Text(text = "다이얼로그 열기")
         }
-        Text(text = "카운터 횟수 : ${count.value}")
+        Text(text = "카운터 횟수 : ${count}")
+    }
+}
+
+@Composable
+fun DropDownFunction() {
+    var expandDropDownMenu by remember { mutableStateOf(false) }
+
+    var counter by remember { mutableStateOf(0) }
+    
+    Column {
+        Button(onClick = { expandDropDownMenu = true }) {
+            Text(text = "드롭다운 메뉴 열기")
+        }
+        Text(text = "카운터: $counter")
+        
+        DropdownMenu(expanded = expandDropDownMenu,
+            onDismissRequest = {
+                expandDropDownMenu = false
+
+            }) {
+            DropdownMenuItem(onClick = { counter++ }) {
+                Text(text = "증가")
+            }
+            DropdownMenuItem(onClick = { counter-- }) {
+                Text(text = "감소")
+            }
+            
+        }
     }
 
 }
