@@ -45,6 +45,7 @@ import coil.compose.rememberImagePainter
 import com.example.compose_etc.MainActivity.Companion.placeHoldercardData
 import com.example.compose_etc.ui.theme.Compose_etcTheme
 import com.example.compose_etc.R.drawable
+import kotlinx.coroutines.launch
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import kotlin.contracts.contract
 
@@ -57,7 +58,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Compose_etcTheme {
-                customDialogEx()
+                SnackBarFunction()
             }
         }
     }
@@ -628,11 +629,9 @@ fun customDialogEx() {
                                 Text(text = "accept")
                             }
                         }
-
                     }
                 }
             }
-
         }
 
         Button(onClick = {
@@ -641,13 +640,13 @@ fun customDialogEx() {
             Text(text = "다이얼로그 열기")
         }
         Text(text = "카운터 횟수 : ${count}")
+
     }
 }
 
 @Composable
 fun DropDownFunction() {
     var expandDropDownMenu by remember { mutableStateOf(false) }
-
     var counter by remember { mutableStateOf(0) }
     
     Column {
@@ -668,6 +667,32 @@ fun DropDownFunction() {
                 Text(text = "감소")
             }
             
+        }
+    }
+}
+
+@Composable
+fun SnackBarFunction() {
+
+    var counter by remember { mutableStateOf(0) }
+    val coroutineScope = rememberCoroutineScope()
+    val scaffoldState = rememberScaffoldState()
+
+    Scaffold(scaffoldState = scaffoldState) {
+        LaunchedEffect(scaffoldState.snackbarHostState) {
+            coroutineScope.launch {
+                scaffoldState.snackbarHostState.showSnackbar(
+                    message = "카운터는 ${counter}",
+                    actionLabel = "닫기",
+                    duration = SnackbarDuration.Short
+
+                )
+            }
+        }
+        Button(modifier = Modifier.padding(it),onClick = {
+            counter++
+        }) {
+            Text(text = "더하기")
         }
     }
 
