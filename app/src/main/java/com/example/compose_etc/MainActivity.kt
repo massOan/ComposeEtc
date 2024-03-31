@@ -47,6 +47,7 @@ import com.example.compose_etc.ui.theme.Compose_etcTheme
 import com.example.compose_etc.R.drawable
 import kotlinx.coroutines.launch
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
+import java.time.Duration
 import kotlin.contracts.contract
 
 
@@ -58,7 +59,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Compose_etcTheme {
-                SnackBarFunction()
+                BottomAppBarFuction()
             }
         }
     }
@@ -80,7 +81,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DefaultPreview() {
     Compose_etcTheme {
-        ConstraintSetFunction()
+        BottomAppBarFuction()
     }
 }
 
@@ -603,8 +604,7 @@ fun customDialogEx() {
                         modifier = Modifier
                             .width(300.dp)
                             .height(150.dp)
-                            .padding(8.dp)
-                            ,
+                            .padding(8.dp),
                     ) {
                         Text(text = "현재 텍스트 입력 입력입력입력")
 
@@ -648,13 +648,13 @@ fun customDialogEx() {
 fun DropDownFunction() {
     var expandDropDownMenu by remember { mutableStateOf(false) }
     var counter by remember { mutableStateOf(0) }
-    
+
     Column {
         Button(onClick = { expandDropDownMenu = true }) {
             Text(text = "드롭다운 메뉴 열기")
         }
         Text(text = "카운터: $counter")
-        
+
         DropdownMenu(expanded = expandDropDownMenu,
             onDismissRequest = {
                 expandDropDownMenu = false
@@ -666,7 +666,7 @@ fun DropDownFunction() {
             DropdownMenuItem(onClick = { counter-- }) {
                 Text(text = "감소")
             }
-            
+
         }
     }
 }
@@ -685,16 +685,65 @@ fun SnackBarFunction() {
                     message = "카운터는 ${counter}",
                     actionLabel = "닫기",
                     duration = SnackbarDuration.Short
-
                 )
             }
         }
-        Button(modifier = Modifier.padding(it),onClick = {
+        Button(modifier = Modifier.padding(it), onClick = {
             counter++
         }) {
             Text(text = "더하기")
         }
     }
+}
 
+@Composable
+fun BottomAppBarFuction() {
+    val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
+    var counter by remember { mutableStateOf(0) }
+    Scaffold(
+        scaffoldState = scaffoldState,
+        bottomBar = {
+            BottomAppBar() {
+                Text(text = "헬로")
+                Button(onClick = {
+                    coroutineScope.launch {
+                        scaffoldState.snackbarHostState.showSnackbar(message = "안녕하세요")
+                    }
+                }) {
+                    Text(text = "인사하기")
+                }
+
+                Button(onClick = {
+                    counter++
+                    coroutineScope.launch {
+                        scaffoldState.snackbarHostState.showSnackbar(message = "Counter : ${counter} 입니다")
+                    }
+
+                }) {
+                    Text(text = "더하기")
+
+                }
+                Button(onClick = {
+                    counter--
+                    coroutineScope.launch {
+                        scaffoldState.snackbarHostState.showSnackbar(message = "Counter : ${counter} 입니다")
+                    }
+                }) {
+                    Text(text = "빼기")
+                }
+
+            }
+        }
+    ) {
+        Box(modifier = Modifier.padding(it)) {
+            Column() {
+                Text(text = "BotoomAppBar 예제")
+                Text(text = "Counter : ${counter} ")
+            }
+
+        }
+
+    }
 }
 
