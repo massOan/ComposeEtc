@@ -3,6 +3,7 @@ package com.example.compose_etc
 import android.content.ClipData.Item
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -40,6 +43,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import com.example.compose_etc.MainActivity.Companion.placeHoldercardData
@@ -59,7 +65,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Compose_etcTheme {
-                BottomAppBarFuction()
+                PyongToSquareMeter()
             }
         }
     }
@@ -81,7 +87,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DefaultPreview() {
     Compose_etcTheme {
-        BottomAppBarFuction()
+        PyongToSquareMeter()
     }
 }
 
@@ -744,6 +750,110 @@ fun BottomAppBarFuction() {
 
         }
 
+    }
+}
+
+@Composable
+fun PyongToSquareMeter() {
+    var pyeong by rememberSaveable {
+        mutableStateOf("23")
+    }
+    var squaremeter by rememberSaveable {
+        mutableStateOf((23 * 3.306).toString())
+    }
+
+    PyongToSquareMeterStateless(pyeong, squaremeter) {
+        if (it.isBlank()) {
+            pyeong = ""
+            squaremeter = ""
+            return@PyongToSquareMeterStateless
+        }
+        val numaricValue = it.toFloatOrNull() ?: return@PyongToSquareMeterStateless
+        pyeong = it
+        squaremeter = (numaricValue * 3.306).toString()
+
+    }
+}
+
+@Composable
+fun PyongToSquareMeterStateless(
+    pyeong: String,
+    squareMeter: String,
+    onPyeongChange: (String) -> Unit,
+
+    ) {
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        OutlinedTextField(
+            value = pyeong,
+            onValueChange = onPyeongChange, label = {
+                Text(text = "평")
+            })
+        OutlinedTextField(
+            value = squareMeter,
+            onValueChange = {
+            }, label = {
+                Text(text = "제곱미터")
+            })
+
+    }
+}
+
+@Composable
+fun EffectFuction(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
+
+    val scaffoldState = rememberScaffoldState()
+
+    LaunchedEffect(scaffoldState.snackbarHostState) {
+        scaffoldState.snackbarHostState.showSnackbar("LaunchedEffect Show SnackBar")
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver{ _, event ->
+            when(event) {
+                Lifecycle.Event.ON_START -> {
+                    Log.d("DispoableEffect" , "ON_START")
+                }
+                Lifecycle.Event.ON_ANY -> {
+                    Log.d("DispoableEffect" , "ON_ANY")
+
+                }
+                Lifecycle.Event.ON_CREATE -> {
+                    Log.d("DispoableEffect" , "ON_CREATE")
+
+                }
+                Lifecycle.Event.ON_DESTROY -> {
+                    Log.d("DispoableEffect" , "ON_DESTROY")
+
+                }
+                Lifecycle.Event.ON_PAUSE -> {
+                    Log.d("DispoableEffect" , "ON_PAUSE")
+
+                }
+                Lifecycle.Event.ON_RESUME -> {
+                    Log.d("DispoableEffect" , "ON_RESUME")
+
+                }
+                Lifecycle.Event.ON_STOP -> {
+                    Log.d("DispoableEffect" , "ON_STOP")
+                }
+                else ->  {
+                    Log.d("DispoableEffect" , "그 외")
+
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+
+    }
+
+    Scaffold(scaffoldState = scaffoldState) {
+        Column(modifier = Modifier.padding(it)) {
+
+        }
     }
 }
 
