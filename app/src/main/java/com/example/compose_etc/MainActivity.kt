@@ -1,53 +1,21 @@
 package com.example.compose_etc
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.DrawableRes
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.ConstraintSet
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
-import coil.compose.AsyncImage
-import coil.compose.rememberImagePainter
+import androidx.lifecycle.ViewModel
 import com.example.compose_etc.ui.theme.Compose_etcTheme
-import com.example.compose_etc.R.drawable
-import kotlinx.coroutines.launch
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -66,13 +34,13 @@ class MainActivity : ComponentActivity() {
     companion object {
         const val BASE_URL = "https://picsum.photos/"
 
-    /*   val placeHoldercardData = CardData(
-            imageUrl = "${BASE_URL}id/237/200/300",
-            imageDescription = "더미이미지",
-            author = "picsum",
-            description = "Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups."
-           )
-    */
+        /*   val placeHoldercardData = CardData(
+                imageUrl = "${BASE_URL}id/237/200/300",
+                imageDescription = "더미이미지",
+                author = "picsum",
+                description = "Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups."
+               )
+        */
 
     }
 }
@@ -85,27 +53,20 @@ fun DefaultPreview() {
 }
 
 
-
 data class ToDodata(
     val key: Int,
     val text: String,
     val done: Boolean = false,
 )
 
-@Preview(showBackground = true)
-@Composable
-fun TopLevel() {
-    val (text, setText) = remember {
-        mutableStateOf("")
-    }
+class TodoViewModel : ViewModel() {
+    val text = mutableStateOf("")
+    val toDoList = mutableStateListOf<ToDodata>()
 
-    val toDoList = remember { mutableStateListOf<ToDodata>() }
-    // MutableStateList가 추가, 삭제, 변경되었을 때만 UI갱신
-    // 항목 하나의 길을 바꾸는 것 보다 항목 자체를 바꾸는게 나을 것 같다.
     val onSubmit: (String) -> Unit = { text ->
         val key = (toDoList.lastOrNull()?.key ?: 0) + 1
         toDoList.add(ToDodata(key, text))
-        setText("")
+        viewModel.text.value = ""
     }
 
     val onToggle: (Int, Boolean) -> Unit = { key, checked ->
@@ -129,21 +90,34 @@ fun TopLevel() {
         toDoList[i] = toDoList[i].copy(text = text)
     }
 
-    Scaffold {
-        Column(modifier = Modifier.padding(it)) {
+}
+
+@Composable
+fun TopLevel(viewModel: TodoViewModel = viewModel()) {
+
+
+//    val toDoList = remember { mutableStateListOf<ToDodata>() }
+    // MutableStateList가 추가, 삭제, 변경되었을 때만 UI갱신
+    // 항목 하나의 길을 바꾸는 것 보다 항목 자체를 바꾸는게 나을 것 같다.
+
+
+    Scaffold { content ->
+        Column(modifier = Modifier.padding(content)) {
             ToDoInput(
-                text = text,
-                onTextChange = setText,
-                onSubmit = onSubmit,
+                text = viewModel.text.value,
+                onTextChange = {
+                    viewModel.text.value = it
+                },
+                onSubmit = viewModel.onSubmit,
             )
 
             LazyColumn() {
-                items(toDoList, key = { it.key }) { toDoData ->
+                items(viewModel.toDoList, key = { it.key }) { toDoData ->
                     Todo(
                         toDoData = toDoData,
-                        onToggle = onToggle,
-                        onDelete = onDelete,
-                        onEdit = onEdit
+                        onToggle = viewModel.onToggle,
+                        onDelete = viewModel.onDelete,
+                        onEdit = viewModel.onEdit
                     )
                 }
             }
