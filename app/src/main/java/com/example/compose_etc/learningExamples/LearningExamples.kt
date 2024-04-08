@@ -38,6 +38,11 @@ import androidx.constraintlayout.compose.ConstraintSet
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import com.example.compose_etc.R
@@ -804,4 +809,77 @@ fun EffectFuction(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) 
         Column(modifier = Modifier.padding(it)) {
         }
     }
+}
+
+@Composable
+fun NavigationFunction(
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController()
+
+    ) {
+
+    NavHost(navController, "Home", modifier = modifier) {
+        composable("Home") {
+            Column {
+                Text(text = "Home")
+                Button(onClick = {
+                    navController.navigate("Office")
+
+                }) {
+                    Text(text = "Office로 이동")
+                }
+
+                Button(onClick = {
+                    navController.navigate("Playground")
+
+                }) {
+                    Text(text = "Playground로 이동")
+                }
+            }
+        }
+        composable("Office") {
+            Column {
+                Button(onClick = {
+                    navController.navigate("Home")
+
+                }) {
+                    Text(text = "Home으로 이동")
+                }
+
+                Button(onClick = {
+                    navController.navigate("Playground")
+
+                }) {
+                    Text(text = "Playground로 이동")
+                }
+            }
+
+        }
+        composable("Playground") {
+            Column {
+                Text(text = "Playground")
+
+                Button(onClick = {
+                    navController.navigate("Office")
+
+                }) {
+                    Text(text = "Office로 이동")
+                }
+
+                Button(onClick = {
+                    navController.navigate("Home")
+
+                }) {
+                    Text(text = "Home으로 이동")
+                }
+
+            }
+
+
+        }
+
+
+    }
+    
+    
 }
